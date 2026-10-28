@@ -1,0 +1,9 @@
+{
+  "slug": "ecommerce-video-skills",
+  "title": "6张商品图→17秒带货短视频：开源12个Claude Skills，配音、字幕花字、BGM本地一条命令出片",
+  "csdn": "https://blog.csdn.net/xianyu120/article/details/167084890",
+  "pages": "https://maynor996.github.io/ecommerce-video-skills/",
+  "source": "scrape",
+  "imgs": 6,
+  "workdir": "/workspace/csdn-mirror/build/ecommerce-video-skills"
+}

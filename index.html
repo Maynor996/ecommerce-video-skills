@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>6张商品图→17秒带货短视频：开源12个Claude Skills，配音、字幕花字、BGM本地一条命令出片</title>
+<meta name="description" content="6张商品图→17秒带货短视频：开源12个Claude Skills，配音、字幕花字、BGM本地一条命令出片 一句话介绍：ecommerce-video-skills 是一套开源的电商短视频 Agent Skills。丢几张商品图给 Claude Code / Codex / Cursor，它会写钩子和分镜、出多模型镜头">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f7f5f0;--card:#fff;--text:#1a1a1a;--muted:#5c5c5c;--accent:#1a73e8;--border:#e6e2d8;--code-bg:#f0eee8}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;font-size:17px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:760px;margin:0 auto;padding:2.5rem 1.25rem 4rem}
+article{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:2rem 1.75rem 2.5rem;box-shadow:0 8px 30px rgba(0,0,0,.04)}
+h1{font-family:"Noto Serif SC",serif;font-size:clamp(1.55rem,4vw,2rem);line-height:1.4;margin:0 0 1.25rem;font-weight:700}
+h2{font-family:"Noto Serif SC",serif;font-size:1.35rem;margin:2.25rem 0 .9rem;padding-top:.5rem;border-top:1px solid var(--border);font-weight:700}
+h2:first-of-type{border-top:none;padding-top:0}h3{font-size:1.1rem;margin:1.5rem 0 .6rem}
+p{margin:.9rem 0}a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+ul,ol{padding-left:1.35rem;margin:.8rem 0}li{margin:.35rem 0}strong{font-weight:700}
+img{display:block;max-width:100%;height:auto;margin:1.1rem auto .35rem;border-radius:10px;border:1px solid var(--border);background:#fafafa}
+pre{background:var(--code-bg);border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem;overflow-x:auto;font-size:.88rem;line-height:1.55}
+code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.9em;background:var(--code-bg);padding:.1em .35em;border-radius:4px}
+pre code{background:none;padding:0}
+blockquote{margin:1rem 0;padding:.2rem 0 .2rem 1rem;border-left:3px solid var(--accent);color:var(--muted)}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.95rem}
+th,td{border:1px solid var(--border);padding:.55rem .7rem;text-align:left;vertical-align:top}th{background:#f3f1eb}
+.meta{color:var(--muted);font-size:.92rem;margin-bottom:1.5rem}
+.pages-banner{margin:0 0 1.25rem;padding:.75rem 1rem;background:#eef5ff;border:1px solid #d0e2ff;border-radius:10px;font-size:.95rem}
+footer{margin-top:2rem;padding-top:1rem;border-top:1px solid var(--border);color:var(--muted);font-size:.88rem}
+</style></head><body><div class="wrap"><article>
+<div class="pages-banner">在线阅读（GitHub Pages）：<a href="https://maynor996.github.io/ecommerce-video-skills/">https://maynor996.github.io/ecommerce-video-skills/</a></div>
+<h1>6张商品图→17秒带货短视频：开源12个Claude Skills，配音、字幕花字、BGM本地一条命令出片</h1>
+<div class="meta">原文：<a href="https://blog.csdn.net/xianyu120/article/details/167084890">https://blog.csdn.net/xianyu120/article/details/167084890</a></div>
+<h2>6张商品图→17秒带货短视频：开源12个Claude Skills，配音、字幕花字、BGM本地一条命令出片</h2>
+<blockquote>
+<p>一句话介绍：<strong>ecommerce-video-skills</strong> 是一套开源的电商短视频 Agent Skills。丢几张商品图给 Claude Code / Codex / Cursor，它会写钩子和分镜、出多模型镜头提示词，并且<strong>真的在本地用 Python + ffmpeg 把视频剪出来</strong> ——配音、字幕花字、转场、BGM、多平台导出都包含在内。</p>
+<p>仓库地址：https://github.com/xianyu110/ecommerce-video-skills （MIT 协议）</p>
+</blockquote>
+<p><img alt="17 秒 9:16 带货视频，由 scripts/assemble.py 本地一条命令渲染，素材是 6 张商品图" src="imgs/01.gif" /></p>
+<h3>一、痛点：带货视频，卡的不是创意，是流水线</h3>
+<p>做电商短视频，一条 15 秒的视频要走完：写脚本 → 想前三秒钩子 → 分镜 → 找素材/图生视频 → 配音 → 字幕花字 → 剪辑 → 加 BGM → 按平台导出 → 做封面。</p>
+<p>问题在于：</p>
+<ul>
+<li><strong>AI 能写脚本，但不会剪片</strong> ：让大模型写分镜很容易，最后还是得自己开剪辑软件一镜一镜拖。</li>
+<li><strong>图生视频“很酷但商品变了”</strong> ：瓶身颜色变了、Logo 糊了，带货视频最怕这个。</li>
+<li><strong>每个平台尺寸不一样</strong> ：抖音 9:16、小红书 3:4 更占屏、淘宝主图视频 1:1、Amazon 常用 16:9，底部还有商品卡和右侧按钮会挡字幕。</li>
+<li><strong>广告法</strong> ：“最好”“第一”“100% 有效”一不小心就写进口播里了。</li>
+</ul>
+<p>这个项目的目标是：<strong>把上面这条流水线拆成 Agent 能执行的 12 个步骤，其中剪辑环节用脚本真正跑出成片。</strong></p>
+<h3>二、项目是什么</h3>
+<p>核心是一条能跑的本地流水线：</p>
+<blockquote>
+<p><code>storyboard.json</code> → edge-tts 逐句配音 → Ken Burns 镜头 → xfade 转场 → ASS 字幕/花字 → BGM 自动闪避 → 两遍响度标准化（≈ -14 LUFS）→ MP4 + SRT</p>
+</blockquote>
+<p>纯 Python + ffmpeg，<strong>不需要剪辑软件，剪辑这一步也不需要任何 API Key</strong> （配音用的是免费的 edge-tts）。</p>
+<p><img alt="12 个 skill 的流水线关系（来自仓库 README）" src="imgs/02.png" /></p>
+<p>和一堆提示词相比，它还做了这些事：</p>
+<ul>
+<li>🔒 <strong>商品一致性锁</strong> ：图生视频提示词第一步先锁定形状/颜色/Logo。</li>
+<li>🧠 <strong>模型中立</strong> ：同一份分镜适配 Seedance / 可灵 / Veo / Runway / 海螺 / 万相等，<strong>不编造任何模型的价格或参数</strong> ，每个镜头都有本地 Ken Burns 兜底。</li>
+<li>📐 <strong>平台规格 + 安全区</strong> ：字幕避开底部商品卡和右侧按钮。</li>
+<li>🌏 <strong>出海友好</strong> ：storyboard 加 <code>line_en</code> 等字段，<code>--lang en</code> 直接渲染英文版。</li>
+<li>⚖️ <strong>合规意识</strong> ：钩子/评测模板内置广告法绝对化用语检查、“只写测过的数据”、公平对比规则。</li>
+</ul>
+<h3>三、技能清单（12 个）</h3>
+<table>
+<thead>
+<tr>
+<th>Skill</th>
+<th>做什么</th>
+<th>脚本</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>image-to-video-shots</code></td>
+<td>主图转视频：图生视频镜头提示词 + 商品一致性锁 + 本地 Ken Burns 兜底</td>
+<td>assemble.py</td>
+</tr>
+<tr>
+<td><code>hook-3s-script</code></td>
+<td>3 秒钩子：9 种钩子类型一次出 6–10 版（台词+画面+花字），广告法自检</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>selling-point-storyboard</code></td>
+<td>卖点分镜：15/30/60 秒结构，一镜一信息，输出可渲染的 storyboard.json</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>multi-model-shot-prompts</code></td>
+<td>多模型镜头提示词：通用骨架 + 运镜词表 + 文生/首帧/首尾帧写法</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>ai-voiceover-edge-tts</code></td>
+<td>AI 口播：edge-tts 逐句合成、去静音、时长统计、缓存</td>
+<td>tts_edge.py</td>
+</tr>
+<tr>
+<td><code>subtitles-and-text-effects</code></td>
+<td>字幕花字：ASS 四种样式（字幕/弹出花字/贴纸/CTA）、关键词高亮、安全区</td>
+<td>make_subs.py</td>
+</tr>
+<tr>
+<td><code>ffmpeg-auto-assemble</code></td>
+<td>一条命令出片：配音、转场、字幕、BGM 闪避、响度标准化</td>
+<td>assemble.py 等 5 个</td>
+</tr>
+<tr>
+<td><code>platform-spec-export</code></td>
+<td>抖音/TikTok Shop/视频号/小红书/淘宝/Amazon 规格导出，安全区预览</td>
+<td>export_platform.py</td>
+</tr>
+<tr>
+<td><code>live-stream-clips</code></td>
+<td>直播切片：时间戳 / 字幕关键词 / 停顿提议三种选段</td>
+<td>live_clip.py</td>
+</tr>
+<tr>
+<td><code>unboxing-comparison-review</code></td>
+<td>开箱/对比评测：结构、拍摄清单、公平对比规则</td>
+<td>make_cards.py</td>
+</tr>
+<tr>
+<td><code>multilingual-dubbing</code></td>
+<td>多语言配音：本地化改写 + 各市场音色 + <code>--lang</code> 一键渲染</td>
+<td>assemble.py</td>
+</tr>
+<tr>
+<td><code>cover-title-ab</code></td>
+<td>封面标题 A/B：挑清晰帧/干净底图 + 多标题版式 + 对比图</td>
+<td>cover_ab.py</td>
+</tr>
+</tbody>
+</table>
+<h3>四、安装</h3>
+<pre><code>npx skills add xianyu110/ecommerce-video-skills          # 一行安装（skills CLI）
+# 或在 Claude Code 里：/plugin marketplace add xianyu110/ecommerce-video-skills
+</code></pre>
+<p>手动安装：</p>
+<pre><code>git clone https://github.com/xianyu110/ecommerce-video-skills.git &amp;&amp; cd ecommerce-video-skills
+mkdir -p ~/.claude/skills &amp;&amp; cp -r skills/* ~/.claude/skills/     # Claude Code
+mkdir -p ~/.codex/skills  &amp;&amp; cp -r skills/* ~/.codex/skills/      # Codex
+mkdir -p .cursor/skills   &amp;&amp; cp -r skills/* .cursor/skills/       # Cursor（项目内）
+pip install -r requirements.txt   # pillow numpy edge-tts；另需自行安装 ffmpeg（含 libass）和中文字体
+</code></pre>
+<h3>五、实战：30 秒跑通仓库自带示例</h3>
+<h4>Step 1：看一眼 storyboard.json</h4>
+<p>示例在 <code>examples/aura-bottle/</code>，6 个镜头，每个镜头一张图 + 一句口播。节选前两镜：</p>
+<pre><code>{
+  "voice": "zh-CN-YunxiNeural",
+  "rate": "+12%",
+  "bgm": "auto",
+  "tag": "AURA 保温杯 · 演示",
+  "shots": [
+    {"image": "assets/lifestyle.webp", "motion": "punch", "transition": "slideup",
+     "line": "夏天带冰水出门，不到中午就变温了？",
+     "sub": "冰水不到中午就**变温**了？", "title": "冰水撑不到中午？"},
+    {"image": "assets/white-bg.webp", "motion": "zoom_in", "transition": "fade",
+     "line": "换这只 AURA 保温杯试试。", "sub": "换这只 **AURA** 保温杯试试"}
+  ]
+}
+</code></pre>
+<p>几个关键字段：<code>line</code> 是配音文本（镜头时长 = 配音时长 + 前导 + 留白，<strong>自动对齐</strong> ）；<code>sub</code> 里 <code>**xx**</code> 是关键词高亮、<code>|</code> 是分行；<code>title</code> 是弹出花字；<code>motion</code> 支持 <code>zoom_in / zoom_out / pan_* / punch / static</code>，<code>punch</code> 是 0.35 秒快速推近，专门给开场钩子用。</p>
+<h4>Step 2：一条命令出片</h4>
+<pre><code>python scripts/assemble.py examples/aura-bottle/storyboard.json -o out/aura.mp4
+</code></pre>
+<p>示例渲染出的成片参数（用 <code>ffprobe</code> 实测）：1080×1920、30fps、H.264 + AAC、17.03 秒，同时输出 <code>.srt</code> 字幕文件：</p>
+<pre><code>1
+00:00:00,100 --&gt; 00:00:02,755
+冰水不到中午就变温了？
+
+2
+00:00:02,955 --&gt; 00:00:04,873
+换这只 AURA 保温杯试试
+</code></pre>
+<p>想先看节奏不想等配音，可以离线预览：<code>--tts none</code>（按字数估时）。</p>
+<p><img alt="成片抽帧（中文版）" src="imgs/03.jpeg" /></p>
+<h4>Step 3：同一份分镜渲染英文版</h4>
+<pre><code>python scripts/assemble.py examples/aura-bottle/storyboard.json --lang en \
+  --voice en-US-AndrewNeural -o out/aura-en.mp4 --build build/en
+</code></pre>
+<p><code>--lang en</code> 会读取 <code>line_en / sub_en / title_en / cta_en</code> 字段。<code>multilingual-dubbing</code> 里还列了美国、英国、印尼、泰国、越南、日韩、墨西哥、巴西等市场的 edge-tts 音色。</p>
+<p><img alt="英文版抽帧" src="imgs/04.jpeg" /></p>
+<h4>Step 4：多平台导出 + 安全区检查</h4>
+<pre><code>python scripts/export_platform.py out/aura.mp4 --platform douyin tiktok-shop channels xiaohongshu taobao-main amazon
+python scripts/export_platform.py out/aura.mp4 --safe-preview out/safe.png   # 安全区叠加图
+</code></pre>
+<p>比例不同时默认“模糊填充”（<code>--mode blur</code>），也可以 <code>--mode crop</code> 裁切。导出完会写一份 <code>export_report.json</code>，记录每个版本的分辨率、时长、体积。</p>
+<p>安全区预览会在一帧上叠加三块经验区域：顶部状态栏约 9%、右侧按钮栏约 15% 宽、底部文案/商品卡约 22%。可以看到字幕和花字都避开了红色区域（这些是经验值，<strong>最终以真机预览为准</strong> ）：</p>
+<p><img alt="安全区预览：红色为容易被遮挡的区域" src="imgs/05.jpeg" /></p>
+<h4>Step 5：封面 A/B</h4>
+<pre><code>python scripts/cover_ab.py out/aura.mp4 --images build/still00.png build/still03.png \
+  --titles "冰水撑不到中午？|早上的冰，晚上还在"
+</code></pre>
+<p>输出 <code>cover_A.jpg</code>、<code>cover_B.jpg</code>… 和一张对比图 <code>ab_sheet.jpg</code>，四种版式轮换（黄字黑描边 / 白字红描边 / 黄底黑字横幅 / 半透明黑底白字）：</p>
+<p><img alt="cover-title-ab 输出的封面对比图" src="imgs/06.jpeg" /></p>
+<p>一个真实的小教训：A 版的底图本身就带了标题字（来自小红书封面图），新标题叠上去就有点打架。所以 skill 里推荐<strong>优先用不带字幕的干净底图</strong> （<code>--images build/still*.png</code>），而不是直接抽成片帧。</p>
+<h3>六、进阶技巧</h3>
+<p><strong>1. 先让 Agent 写钩子，再进分镜</strong></p>
+<pre><code>用 hook-3s-script 给这个保温杯写 8 个前三秒开场，标出推荐 Top 3
+</code></pre>
+<p>skill 要求每条 ≤ 18 个汉字（3 秒说完）、第一帧必须是商品或痛点（别放 logo 片头）、花字 ≤ 10 字，并且禁用“最、第一、顶级、国家级、100%、根治”等绝对化用语——示例里的“8 小时”“晚上还有冰”也明确标注了：<strong>只有真测过才能用</strong> 。</p>
+<p><strong>2. 直播录像切高光</strong></p>
+<pre><code># 按字幕关键词找片段，并烧录字幕
+python scripts/live_clip.py live.mp4 --srt live.srt --keywords "演示,对比,上链接,库存" --window 30 --burn-subs
+# 没有字幕：在停顿处切分，输出候选 CSV 再挑
+python scripts/live_clip.py live.mp4 --propose 30 &gt; proposals.csv
+</code></pre>
+<p>横屏会自动转成 9:16（模糊背景 + 居中画面）。</p>
+<p><strong>3. 用你自己有版权的音乐</strong></p>
+<p><code>bgm: "auto"</code> 是 <code>make_bgm.py</code> 实时合成的免版权 BGM；想换音乐就 <code>--bgm music.mp3</code>。有人声时 BGM 会自动再压低（闪避），最后统一做两遍 loudnorm。</p>
+<p><strong>4. 想接真正的图生视频模型</strong></p>
+<p>用 <code>multi-model-shot-prompts</code> 把同一份分镜改写成不同视频模型的提示词，生成的片段在 storyboard 里用 <code>video</code> + <code>start</code> 字段替换图片即可；没生成好的镜头，Ken Burns 兜底照样能出片。</p>
+<h3>七、没有 Claude / API？</h3>
+<p>这些 skill 在任何能读 <code>SKILL.md</code> 的 Agent 里都能用；本地剪辑脚本<strong>不需要任何 API Key</strong> 。如果你还没有趁手的模型/接口：</p>
+<ul>
+<li><strong>方法一 · Claude 国内镜像站</strong> ：<code>https://claude-opus.top/</code> —— 打开即用，把 SKILL.md 粘进对话就能按步骤出脚本、分镜和提示词</li>
+<li><strong>方法二 · 一站式 API</strong> ：<code>https://tryallapi.com/register?aff=5A6A</code> —— 需要在脚本或 Agent 里调模型时，可以把 <code>https://tryallapi.com/v1</code> 作为 OpenAI 兼容的 BASE_URL（任何 OpenAI 兼容网关均可）</li>
+<li><strong>商品图还没做？</strong> <code>https://gptimage2.asia/</code> —— 在线用 GPT Image 2.5 生成主图和场景图，出好图再交给本仓库转成视频</li>
+</ul>
+<h3>八、写在最后</h3>
+<p>这套 skill 不是要替代剪辑师，而是把“批量出带货视频”里重复、确定的部分自动化：分镜写成 JSON，剪辑交给 ffmpeg，规格和安全区交给脚本，人只需要把关卖点是否真实、成片是否好看。</p>
+<p>示例中的「AURA」是 AI 生成的虚构商品，“24h 保冰”等卖点仅作演示。平台规则经常变化，上传前请以各平台官方说明为准。</p>
+<p>觉得有帮助的话，欢迎点个 ⭐ Star：</p>
+<p>👉 <strong>https://github.com/xianyu110/ecommerce-video-skills</strong></p>
+<p><strong>姊妹仓库：</strong></p>
+<ul>
+<li>先出图再出视频：电商出图 Skills（本仓库示例视频的素材就来自它）：https://github.com/xianyu110/ecommerce-image-skills</li>
+<li>品牌 IP 视觉套件 Skills：https://github.com/xianyu110/brand-ip-kit-skills</li>
+<li>国内上线 Skills（ICP 备案 · 支付 · 小程序 · 隐私合规）：https://github.com/xianyu110/golive-china-skills</li>
+</ul>
+<hr />
+<p>我是 MaynorAI 团队，分享 AI 编程、AI SaaS 工具出海、一人团队搭建经验。</p>
+<footer>镜像自 CSDN @xianyu120 · 内容以原文为准</footer>
+</article></div></body></html>
